@@ -1,0 +1,19 @@
+__pycache__
+.env
+.idea
+.python-version
+.ruff_cache
+.vscode 
+
+cache
+dist
+
+/locations.json
+
+# don't save any of the large files
+source_files/*.pbf
+
+# Do not commit ComStock results
+ComStock
+
+cbl.code-workspace

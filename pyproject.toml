@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "comstock-processor"
+version = "0.1.0"
+description = "A tool to download and process ComStock data."
+authors = ["Nicholas Long <nllong>"]
+license = "BSD"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pandas = ">2"
+requests = "~2.31"
+pathlib = "^1.0.1"
+pyarrow = "^16.1.0"
+fastparquet = "^2024.5.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.2.2"
+pytest-mock = "^3.10.0"
+mypy = "^0.991"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+python_version = "3.8"
+files = [
+    "your_module.py",
+    "tests/"
+]
+ignore_missing_imports = true
+strict = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = ["tests"]
