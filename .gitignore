@@ -8,12 +8,10 @@ __pycache__
 cache
 dist
 
-/locations.json
-
 # don't save any of the large files
 source_files/*.pbf
+# Large files - do not commit ComStock results
+comstock/comstock_metadata.parquet
+comstock/All-All-All-0-selected_metadata.csv
+comstock/CO-*.csv
 
-# Do not commit ComStock results
-ComStock
-
-cbl.code-workspace

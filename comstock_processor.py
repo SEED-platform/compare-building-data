@@ -22,7 +22,9 @@ class ComStockProcessor:
         if not self.base_dir.exists():
             self.base_dir.mkdir()
 
-        self.base_url = "https://oedi-data-lake.s3.amazonaws.com/nrel-pds-building-stock/end-use-load-profiles-for-us-building-stock/2023/comstock_amy2018_release_2/"
+        # data sets URL are here
+        # self.base_url = "https://oedi-data-lake.s3.amazonaws.com/nrel-pds-building-stock/end-use-load-profiles-for-us-building-stock/2023/comstock_amy2018_release_2/"
+        self.base_url = "https://oedi-data-lake.s3.amazonaws.com/nrel-pds-building-stock/end-use-load-profiles-for-us-building-stock/2024/comstock_amy2018_release_1/"
         self.metadata_url = self.base_url + "metadata/baseline.parquet"
         os.chdir(self.base_dir)
 
@@ -35,19 +37,28 @@ class ComStockProcessor:
         else:
             print(f"Failed to download file: {url}")
 
-    def process_metadata(self) -> DataFrame:
-        self.download_file(self.metadata_url, self.base_dir / "comstock_metadata.parquet")
-        meta_df = pd.read_parquet(self.base_dir / "comstock_metadata.parquet")
+    def process_metadata(self, save_dir: Path) -> DataFrame:
+        self.download_file(self.metadata_url, save_dir / "comstock_metadata.parquet")
+        meta_df = pd.read_parquet(save_dir / "comstock_metadata.parquet")
         meta_df.reset_index(drop=False, inplace=True)
 
         lookup_county = f"{self.state}, {self.county_name}"
-        meta_df = meta_df[(meta_df["in.county_name"] == lookup_county) & (meta_df["in.comstock_building_type"] == self.building_type)]
+        if self.building_type != "All":
+            if self.county_name != "All":
+                meta_df = meta_df[(meta_df["in.county_name"] == lookup_county) & (meta_df["in.comstock_building_type"] == self.building_type)]
+            else:
+                meta_df = meta_df[meta_df["in.comstock_building_type"] == self.building_type]
+        else:
+            if self.county_name != "All":
+                meta_df = meta_df[meta_df["in.county_name"] == lookup_county]
+            else:
+                meta_df = meta_df
 
-        output_csv = self.base_dir / f"{self.state}-{self.county_name}-{self.building_type}-{self.upgrade}-selected_metadata.csv"
+        output_csv = save_dir / f"{self.state}-{self.county_name}-{self.building_type}-{self.upgrade}-selected_metadata.csv"
         meta_df.to_csv(output_csv, index=False)
         return meta_df
 
-    def process_building_time_series(self, meta_df: DataFrame) -> None:
+    def process_building_time_series(self, meta_df: DataFrame, save_dir: Path) -> None:
         for index, row in meta_df.iterrows():
             building_id = str(row["bldg_id"])
             print(f"Now Processing {building_id}")
@@ -56,22 +67,25 @@ class ComStockProcessor:
             self.download_file(building_time_series_file, save_path)
 
             tdf = pd.read_parquet(save_path)
-            tdf.to_csv(self.base_dir / f"{building_id}-{self.upgrade}.csv", index=False)
+            tdf.to_csv(save_dir / f"{building_id}-{self.upgrade}.csv", index=False)
         print("Finished")
 
 
 def main() -> None:
     # Settings for modification
-    state = "OR"
-    county_name = "Multnomah County"
-    building_type = "MediumOffice"
+    state = "All"
+    county_name = "All"
+    building_type = "All"
     upgrade = "0"
-    # get the current working directory
-    base_dir = Path(__file__).resolve().parent / "ComStock"
+    
+    save_dir = Path().resolve() / "datasets" / "comstock"
+    if not save_dir.exists():
+        save_dir.mkdir(parents=True, exist_ok=True)
 
-    processor = ComStockProcessor(state, county_name, building_type, upgrade, base_dir)
-    meta_df = processor.process_metadata()
-    processor.process_building_time_series(meta_df)
+    processor = ComStockProcessor(state, county_name, building_type, upgrade, save_dir)
+    meta_df = processor.process_metadata(save_dir=save_dir)
+    # Do not pull down time series data, this would take forever :)
+    # processor.process_building_time_series(meta_df, save_dir=save_dir)
 
 
 if __name__ == "__main__":
