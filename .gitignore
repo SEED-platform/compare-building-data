@@ -11,7 +11,7 @@ dist
 # don't save any of the large files
 source_files/*.pbf
 # Large files - do not commit ComStock results
-comstock/comstock_metadata.parquet
-comstock/All-All-All-0-selected_metadata.csv
-comstock/CO-*.csv
+datasets/comstock/comstock_metadata.parquet
+datasets/comstock/All-All-All-0-selected_metadata.csv
+datasets/comstock/CO-*.csv
 
