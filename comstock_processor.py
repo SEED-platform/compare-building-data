@@ -45,14 +45,13 @@ class ComStockProcessor:
         lookup_county = f"{self.state}, {self.county_name}"
         if self.building_type != "All":
             if self.county_name != "All":
-                meta_df = meta_df[(meta_df["in.county_name"] == lookup_county) & (meta_df["in.comstock_building_type"] == self.building_type)]
+                meta_df = meta_df[
+                    (meta_df["in.county_name"] == lookup_county) & (meta_df["in.comstock_building_type"] == self.building_type)
+                ]
             else:
                 meta_df = meta_df[meta_df["in.comstock_building_type"] == self.building_type]
-        else:
-            if self.county_name != "All":
-                meta_df = meta_df[meta_df["in.county_name"] == lookup_county]
-            else:
-                meta_df = meta_df
+        elif self.county_name != "All":
+            meta_df = meta_df[meta_df["in.county_name"] == lookup_county]
 
         output_csv = save_dir / f"{self.state}-{self.county_name}-{self.building_type}-{self.upgrade}-selected_metadata.csv"
         meta_df.to_csv(output_csv, index=False)
@@ -77,14 +76,17 @@ def main() -> None:
     county_name = "All"
     building_type = "All"
     upgrade = "0"
-    
+
     save_dir = Path().resolve() / "datasets" / "comstock"
     if not save_dir.exists():
         save_dir.mkdir(parents=True, exist_ok=True)
 
     processor = ComStockProcessor(state, county_name, building_type, upgrade, save_dir)
-    meta_df = processor.process_metadata(save_dir=save_dir)
+    processor.process_metadata(save_dir=save_dir)
+
     # Do not pull down time series data, this would take forever :)
+    # if needed, then assign the method process_metadata to a variable
+    # meta_df = processor.process_metadata(save_dir=save_dir)
     # processor.process_building_time_series(meta_df, save_dir=save_dir)
 
 
