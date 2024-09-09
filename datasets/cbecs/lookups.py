@@ -29,7 +29,7 @@ lookup_pba = {int(item.split("=")[0]): item.split("=")[1] for item in enumeratio
 print(lookup_pba)
 
 
-# PUBCLIM 
+# PUBCLIM
 enumeration = """
 1=Cold or very cold
 2=Cool
