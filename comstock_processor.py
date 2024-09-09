@@ -85,6 +85,7 @@ def main() -> None:
     processor.process_metadata(save_dir=save_dir)
 
     # Do not pull down time series data, this would take forever :)
+    # if needed, then assign the method process_metadata to a variable
     # meta_df = processor.process_metadata(save_dir=save_dir)
     # processor.process_building_time_series(meta_df, save_dir=save_dir)
 
