@@ -14,3 +14,7 @@ Before pushing changes to GitHub, run `pre-commit` to format the code consistent
 ```bash
 pre-commit run --all-files
 ```
+
+# Running
+
+The instructions are contained in the `analysis.ipynb` file.

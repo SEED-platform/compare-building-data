@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 @author: nllong (adapted from jho)
 """
@@ -7,6 +6,9 @@ import os
 from pathlib import Path
 
 import pandas as pd
+
+# import pyarrow because it is used in parquet. Do not remove.
+import pyarrow as pa  # noqa: F401
 import requests
 from pandas import DataFrame
 
@@ -23,13 +25,13 @@ class ComStockProcessor:
             self.base_dir.mkdir()
 
         # data sets URL are here
-        # self.base_url = "https://oedi-data-lake.s3.amazonaws.com/nrel-pds-building-stock/end-use-load-profiles-for-us-building-stock/2023/comstock_amy2018_release_2/"
-        self.base_url = "https://oedi-data-lake.s3.amazonaws.com/nrel-pds-building-stock/end-use-load-profiles-for-us-building-stock/2024/comstock_amy2018_release_1/"
+        self.base_url = "https://oedi-data-lake.s3.amazonaws.com/nrel-pds-building-stock/end-use-load-profiles-for-us-building-stock/2023/comstock_amy2018_release_2/"
+        # self.base_url = "https://oedi-data-lake.s3.amazonaws.com/nrel-pds-building-stock/end-use-load-profiles-for-us-building-stock/2024/comstock_amy2018_release_1/"
         self.metadata_url = self.base_url + "metadata/baseline.parquet"
         os.chdir(self.base_dir)
 
     def download_file(self, url: str, save_path: Path) -> None:
-        response = requests.get(url)
+        response = requests.get(url, timeout=300)
         if response.status_code == 200:
             with open(save_path, "wb") as file:
                 file.write(response.content)
@@ -40,7 +42,7 @@ class ComStockProcessor:
     def process_metadata(self, save_dir: Path) -> DataFrame:
         self.download_file(self.metadata_url, save_dir / "comstock_metadata.parquet")
         meta_df = pd.read_parquet(save_dir / "comstock_metadata.parquet")
-        meta_df.reset_index(drop=False, inplace=True)
+        meta_df = meta_df.reset_index(drop=False)
 
         lookup_county = f"{self.state}, {self.county_name}"
         if self.building_type != "All":

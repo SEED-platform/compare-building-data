@@ -1,4 +1,5 @@
 import os
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -14,25 +15,32 @@ class TestComStockProcessor(unittest.TestCase):
         mock_get.return_value.status_code = 200
         mock_get.return_value.content = b"Test content"
 
-        processor = ComStockProcessor("OR", "Multnomah County", "MediumOffice", "0", Path("/tmp"))
-        save_path = "/tmp/test_file.parquet"
+        # get a temp directory
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+
+        processor = ComStockProcessor("OR", "Multnomah County", "MediumOffice", "0", tmp_path)
+        save_path = tmp_path / "test_file.parquet"
 
         processor.download_file("http://example.com/test_file.parquet", save_path)
 
-        self.assertTrue(os.path.exists(save_path))
+        self.assertTrue(save_path.exists())
         with open(save_path, "rb") as f:
             content = f.read()
         self.assertEqual(content, b"Test content")
-        os.remove(save_path)
+        save_path.unlink()
 
     @patch("requests.get")
     def test_download_file_failure(self, mock_get):
         mock_get.return_value.status_code = 404
 
-        processor = ComStockProcessor("OR", "Multnomah County", "MediumOffice", "0", Path("/tmp"))
-        with patch("builtins.print") as mocked_print:
-            processor.download_file("http://example.com/test_file.parquet", "/tmp/test_file.parquet")
-            mocked_print.assert_called_with("Failed to download file: http://example.com/test_file.parquet")
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+
+            processor = ComStockProcessor("OR", "Multnomah County", "MediumOffice", "0", tmp_path)
+            with patch("builtins.print") as mocked_print:
+                processor.download_file("http://example.com/test_file.parquet", tmp_path / "test_file.parquet")
+                mocked_print.assert_called_with("Failed to download file: http://example.com/test_file.parquet")
 
     @patch("pandas.read_parquet")
     @patch("ComStockProcessor.download_file")
@@ -46,11 +54,14 @@ class TestComStockProcessor(unittest.TestCase):
         df_test = pd.DataFrame(data)
         mock_read_parquet.return_value = df_test
 
-        processor = ComStockProcessor("OR", "Multnomah County", "MediumOffice", "0", Path("/tmp"))
-        meta_df = processor.process_metadata()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
 
-        self.assertEqual(len(meta_df), 1)
-        self.assertEqual(meta_df.iloc[0]["bldg_id"], 1)
+            processor = ComStockProcessor("OR", "Multnomah County", "MediumOffice", "0", tmp_path)
+            meta_df = processor.process_metadata()
+
+            self.assertEqual(len(meta_df), 1)
+            self.assertEqual(meta_df.iloc[0]["bldg_id"], 1)
 
     @patch("pandas.read_parquet")
     @patch("ComStockProcessor.download_file")
@@ -63,14 +74,17 @@ class TestComStockProcessor(unittest.TestCase):
         }
         meta_df = pd.DataFrame(data)
 
-        processor = ComStockProcessor("OR", "Multnomah County", "MediumOffice", "0", Path("/tmp"))
-        processor.process_building_time_series(meta_df)
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
 
-        output_csv = "/tmp/257118-0.csv"
-        self.assertTrue(os.path.exists(output_csv))
-        df_test = pd.read_csv(output_csv)
-        self.assertIn("dummy_column", df_test.columns)
-        os.remove(output_csv)
+            processor = ComStockProcessor("OR", "Multnomah County", "MediumOffice", "0", tmp_path)
+            processor.process_building_time_series(meta_df)
+
+            output_csv = tmp_path / "257118-0.csv"
+            self.assertTrue(os.path.exists(output_csv))
+            df_test = pd.read_csv(output_csv)
+            self.assertIn("dummy_column", df_test.columns)
+            os.remove(output_csv)
 
 
 if __name__ == "__main__":
