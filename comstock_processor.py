@@ -25,9 +25,11 @@ class ComStockProcessor:
             self.base_dir.mkdir()
 
         # data sets URL are here
-        self.base_url = "https://oedi-data-lake.s3.amazonaws.com/nrel-pds-building-stock/end-use-load-profiles-for-us-building-stock/2023/comstock_amy2018_release_2/"
-        # self.base_url = "https://oedi-data-lake.s3.amazonaws.com/nrel-pds-building-stock/end-use-load-profiles-for-us-building-stock/2024/comstock_amy2018_release_1/"
-        self.metadata_url = self.base_url + "metadata/baseline.parquet"
+        # Data lake explorer link: https://data.openei.org/s3_viewer?bucket=oedi-data-lake&prefix=nrel-pds-building-stock%2Fend-use-load-profiles-for-us-building-stock%2F2024%2Fcomstock_amy2018_release_1%2F
+
+        # self.base_url = "https://oedi-data-lake.s3.amazonaws.com/nrel-pds-building-stock/end-use-load-profiles-for-us-building-stock/2023/comstock_amy2018_release_2/"
+        self.base_url = "https://oedi-data-lake.s3.amazonaws.com/nrel-pds-building-stock/end-use-load-profiles-for-us-building-stock/2024/comstock_amy2018_release_1/"
+        self.metadata_url = self.base_url + "metadata/"
         os.chdir(self.base_dir)
 
     def download_file(self, url: str, save_path: Path) -> None:
@@ -40,7 +42,11 @@ class ComStockProcessor:
             print(f"Failed to download file: {url}")
 
     def process_metadata(self, save_dir: Path) -> DataFrame:
-        self.download_file(self.metadata_url, save_dir / "comstock_metadata.parquet")
+        # check if the file already exists, don't download it again if so, but give a warning
+        if (save_dir / "comstock_metadata.parquet").exists():
+            print("Metadata file already exists. Skipping download.")
+        else:
+            self.download_file(f"{self.metadata_url}baseline.parquet", save_dir / "comstock_metadata.parquet")
         meta_df = pd.read_parquet(save_dir / "comstock_metadata.parquet")
         meta_df = meta_df.reset_index(drop=False)
 
@@ -56,20 +62,24 @@ class ComStockProcessor:
             meta_df = meta_df[meta_df["in.county_name"] == lookup_county]
 
         output_csv = save_dir / f"{self.state}-{self.county_name}-{self.building_type}-{self.upgrade}-selected_metadata.csv"
-        meta_df.to_csv(output_csv, index=False)
+        # check if the file has been saved, if so, then just warn the user to delete if needed to save again
+        if output_csv.exists():
+            print(f"Metadata file already exists. Skipping save. Delete {output_csv} if you want to save again.")
+        else:
+            meta_df.to_csv(output_csv, index=False)
         return meta_df
 
     def process_building_time_series(self, meta_df: DataFrame, save_dir: Path) -> None:
-        for index, row in meta_df.iterrows():
+        for _index, row in meta_df.iterrows():
             building_id = str(row["bldg_id"])
-            print(f"Now Processing {building_id}")
-            building_time_series_file = f"{self.base_url}timeseries_individual_buildings/by_state/upgrade={self.upgrade}/state={self.state}/{building_id}-{self.upgrade}.parquet"
-            save_path = self.base_dir / f"{building_id}-{self.upgrade}.parquet"
-            self.download_file(building_time_series_file, save_path)
 
+            print(f"Now Processing {building_id}")
+            building_time_series_file = f"{self.base_url}timeseries_individual_buildings/by_state/upgrade={self.upgrade}/state={row['in.state']}/{building_id}-{self.upgrade}.parquet"
+            save_path = save_dir / f"{building_id}-{self.upgrade}.parquet"
+            self.download_file(building_time_series_file, save_path)
+            # convert to CSV for easier reading
             tdf = pd.read_parquet(save_path)
             tdf.to_csv(save_dir / f"{building_id}-{self.upgrade}.csv", index=False)
-        print("Finished")
 
 
 def main() -> None:
@@ -80,16 +90,18 @@ def main() -> None:
     upgrade = "0"
 
     save_dir = Path().resolve() / "datasets" / "comstock"
-    if not save_dir.exists():
-        save_dir.mkdir(parents=True, exist_ok=True)
+    timeseries_save_dir = save_dir / "timeseries"
+    for d in [save_dir, timeseries_save_dir]:
+        if not d.exists():
+            d.mkdir(parents=True, exist_ok=True)
 
     processor = ComStockProcessor(state, county_name, building_type, upgrade, save_dir)
-    processor.process_metadata(save_dir=save_dir)
+    meta_df = processor.process_metadata(save_dir=save_dir)
 
-    # Do not pull down time series data, this would take forever :)
-    # if needed, then assign the method process_metadata to a variable
-    # meta_df = processor.process_metadata(save_dir=save_dir)
-    # processor.process_building_time_series(meta_df, save_dir=save_dir)
+    # only save the first row of the meta_df for testing
+    meta_df_first_row = meta_df.head(1)
+    # Download a single timeseries file for testing
+    processor.process_building_time_series(meta_df_first_row, save_dir=timeseries_save_dir)
 
 
 if __name__ == "__main__":
