@@ -32,7 +32,7 @@ repos:
         files: \.(json|template)$
   # https://docs.astral.sh/ruff/integrations/#pre-commit
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.0
+    rev: v0.8.1
     hooks:
       # Run the linter
       - id: ruff
@@ -45,3 +45,5 @@ repos:
     rev: 0.8.1
     hooks:
       - id: nbstripout
+        args:
+            - --extra-keys="metadata.celltoolbar cell.metadata.heading_collapsed metadata.kernelspec"
