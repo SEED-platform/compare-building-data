@@ -46,4 +46,5 @@ repos:
     hooks:
       - id: nbstripout
         args:
-            - --extra-keys="metadata.celltoolbar cell.metadata.heading_collapsed metadata.kernelspec"
+            - --extra-keys="metadata.kernelspec"
+        types: [jupyter]
