@@ -14,3 +14,4 @@ source_files/*.pbf
 datasets/comstock/comstock_metadata.parquet
 datasets/comstock/All-All-All-0-selected_metadata.csv
 datasets/comstock/CO-*.csv
+datasets/comstock/timeseries
