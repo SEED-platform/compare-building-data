@@ -46,10 +46,10 @@ repos:
     hooks:
       - id: nbstripout
         types: [jupyter]
-  # - repo: local
-  #   hooks:
-  #     - id: remove-kernelspec
-  #       name: Remove Kernelspec Metadata
-  #       entry: python remove_kernelspec.py
-  #       language: system
-  #       types: [jupyter]
+  - repo: local
+    hooks:
+      - id: remove-version-metadata
+        name: remove version metadata from ipynb files
+        entry: python .pre-commit/remove_kernelspec.py
+        language: system
+        types: [jupyter]
