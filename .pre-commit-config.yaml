@@ -45,6 +45,11 @@ repos:
     rev: 0.8.1
     hooks:
       - id: nbstripout
-        args:
-            - --extra-keys="metadata.kernelspec"
         types: [jupyter]
+  # - repo: local
+  #   hooks:
+  #     - id: remove-kernelspec
+  #       name: Remove Kernelspec Metadata
+  #       entry: python remove_kernelspec.py
+  #       language: system
+  #       types: [jupyter]
