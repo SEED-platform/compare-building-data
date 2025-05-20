@@ -29,6 +29,7 @@ jobs:
       # the entire notebook. It will take ~10 minutes to run on CI because
       # the data are downloaded every time.
       - name: Run notebook and check for completion
+        if: ${{ matrix.python-version == '3.12' }}
         env:
           TEST_DATA: "true"
         run: poetry run jupyter nbconvert --to html --execute analysis.ipynb --output test_output-${{ github.run_id }}.html
