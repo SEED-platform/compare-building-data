@@ -4,14 +4,19 @@ __pycache__
 .python-version
 .ruff_cache
 .vscode
+.github
 
 cache
 dist
 
 # don't save any of the large files
 source_files/*.pbf
+
 # Large files - do not commit ComStock results
 datasets/comstock/comstock_metadata.parquet
 datasets/comstock/All-All-All-0-selected_metadata.csv
 datasets/comstock/CO-*.csv
 datasets/comstock/timeseries
+
+# release file
+compare_building_data.pdf
