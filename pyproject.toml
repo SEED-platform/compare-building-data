@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Compare results of ComStock, CBECS, and ASHRAE Std 100-2024."
 authors = ["Nicholas Long <nllong>", "Lauren Kerr <lkerrnrel>"]
 license = "BSD"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"

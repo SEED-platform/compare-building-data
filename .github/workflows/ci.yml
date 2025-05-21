@@ -8,9 +8,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        python-version: ["3.9", "3.12"]
+        include:
+          - os: ubuntu-latest
+            python-version: "3.9"
+          - os: ubuntu-latest
+            python-version: "3.12"
+          - os: windows-latest
+            python-version: "3.12"
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash # for windows and linux
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
@@ -18,23 +26,44 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Poetry
-        uses: snok/install-poetry@v1.3.4
+        run: |
+          curl -sSL https://install.python-poetry.org | python -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          # Add Poetry to PATH for Windows runners (Bash shell)
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            export PATH="$HOME/.local/bin:/c/Users/runneradmin/AppData/Roaming/Python/Scripts:$PATH"
+          fi
+          # create a .venv folder in the working directory
+          poetry config virtualenvs.in-project true
+          poetry config virtualenvs.create true
+          # ensure poetry is installed by checking the version
+          poetry --version
       - name: Install dependencies
         run: |
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            export PATH="$HOME/.local/bin:/c/Users/runneradmin/AppData/Roaming/Python/Scripts:$PATH"
+          fi
           python -m pip install --upgrade pip
           poetry install
       - name: Run pre-commit
-        run: poetry run pre-commit run --all-files
+        run: |
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            export PATH="$HOME/.local/bin:/c/Users/runneradmin/AppData/Roaming/Python/Scripts:$PATH"
+          fi
+          poetry run pre-commit run --all-files
       # Running notebook will download the comstock data and run
       # the entire notebook. It will take ~10 minutes to run on CI because
       # the data are downloaded every time.
       - name: Run notebook and check for completion
-        if: ${{ matrix.python-version == '3.12' }}
         env:
           TEST_DATA: "true"
-        run: poetry run jupyter nbconvert --to html --execute analysis.ipynb --output test_output-${{ github.run_id }}.html
+        run: |
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            export PATH="$HOME/.local/bin:/c/Users/runneradmin/AppData/Roaming/Python/Scripts:$PATH"
+          fi
+          poetry run jupyter nbconvert --to html --execute analysis_california_eci.ipynb --output test_output-${{ github.run_id }}.html
       - name: Upload HTML Artifact
-        if: ${{ matrix.python-version == '3.12' }}
+        if: ${{ matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest' }}
         uses: actions/upload-artifact@v4
         with:
           name: notebook-html-${{ github.run_id }}
