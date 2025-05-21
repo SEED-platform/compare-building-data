@@ -54,6 +54,10 @@ jobs:
       # Running notebook will download the comstock data and run
       # the entire notebook. It will take ~10 minutes to run on CI because
       # the data are downloaded every time.
+      - name: Install IPython kernel
+        run: |
+          poetry run python -m pip install ipykernel
+          poetry run python -m ipykernel install --user --name=python3
       - name: Run notebook and check for completion
         env:
           TEST_DATA: "true"
