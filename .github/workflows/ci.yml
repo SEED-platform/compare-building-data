@@ -65,6 +65,7 @@ jobs:
           if [[ "$RUNNER_OS" == "Windows" ]]; then
             export PATH="$HOME/.local/bin:/c/Users/runneradmin/AppData/Roaming/Python/Scripts:$PATH"
           fi
+          poetry run python comstock_processor.py
           poetry run jupyter nbconvert --to html --execute analysis.ipynb --output test_output-${{ github.run_id }}.html
       - name: Upload HTML Artifact
         if: ${{ matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest' }}
