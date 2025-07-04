@@ -13,4 +13,3 @@ The default targets are defined as the 25th %-ile of the site energy use intensi
 * **site_energy_50th_percentile**: Table G-3 CBECS/RECS Total Site-Based Energy Use Intensities (2012 CBECS/2015 RECS), kBtu/ft2·yr. Data represents 50th percentile of EUI standards for buildings in different climate zones.
 
 Note that other tables were not transcribed but might be of use, for example, breaking out site electricity and site fossil fuel usage (i.e., Table 7-5a Building Activity Electricity Site Energy Use Intensity Targets and Table 7-6a Building Activity Fossil-Fuel Site Energy Use Intensity Targets).
-
