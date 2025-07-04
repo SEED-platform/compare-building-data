@@ -6,6 +6,8 @@ This directory contains data tables from the ASHRAE Standard 100-2024. These tab
 
 The default targets are defined as the 25th %-ile of the site energy use intensity based on the underlying analysis dataset (conducted by ASHRAE). In the accompanying spreadsheet in this directory, the sheet's tabs are from the following tables in the standard.
 
+* **eui_ratios**: Table G-1 Ratios of Climate Zonal EUI to Average of All EUIs by Building Type. Data represents the climate zone EUI/Average. Numbers greater than 1 show that the climate zone EUI for the building type is higher than the average EUI of the same building type.
+
 * **site_energy_25th_percentile**: Table G-4 Energy Use Intensity Targets (kBtu/ft2·yr). Data represents 25th percentile of EUI standards for buildings in different climate zones.
 
 * **site_energy_40th_percentile**: Table B-1a Alternative Building Activity Site Energy Use Intensity Targets (I-P: kBtu/ft2·yr). Data represents 40th percentile of EUI standards for buildings in different climate zones.
