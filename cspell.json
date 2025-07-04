@@ -1,0 +1,27 @@
+{
+  "version": "0.2",
+  "ignorePaths": [],
+  "dictionaryDefinitions": [],
+  "dictionaries": [],
+  "words": [
+    "ASHRAE",
+    "axvline",
+    "CBECS",
+    "comstock",
+    "darkgoldenrod",
+    "espm",
+    "fontsize",
+    "iecc",
+    "kbtu",
+    "linestyle",
+    "MFBTU",
+    "PUBCLIM",
+    "SQFT",
+    "unioned",
+    "xlabel",
+    "xlim",
+    "ylabel"
+  ],
+  "ignoreWords": [],
+  "import": []
+}
