@@ -5,7 +5,22 @@
   "dictionaries": [],
   "words": [
     "ASHRAE",
-    "CBECS"
+    "axvline",
+    "CBECS",
+    "comstock",
+    "darkgoldenrod",
+    "espm",
+    "fontsize",
+    "iecc",
+    "kbtu",
+    "linestyle",
+    "MFBTU",
+    "PUBCLIM",
+    "SQFT",
+    "unioned",
+    "xlabel",
+    "xlim",
+    "ylabel"
   ],
   "ignoreWords": [],
   "import": []
