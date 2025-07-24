@@ -27,7 +27,7 @@ selenium = "^4.34.2"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.4.1"
 pytest-mock = "^3.14.1"
-mypy = "^1.16"
+mypy = "^1.17"
 pre-commit = "^4.2.0"
 
 [build-system]
