@@ -11,8 +11,6 @@ python = "^3.12"
 pandas = ">2"
 requests = "~2.32"
 pathlib = "^1.0.1"
-pyarrow = "^22.0.0"
-fastparquet = "^2024.5.0"
 seaborn = "^0.13.2"
 openpyxl = "^3.1.5"
 scikit-learn = "^1.7.2"
@@ -23,6 +21,10 @@ nbformat = "^5.10.4"
 nbconvert = "^7.16.6"
 jupyter = "^1.1.1"
 selenium = "^4.38.0"
+
+# you must checkout comstock_processor manually for now
+comstock-processor = {path = "../comstock_processor", develop = true}
+
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.4.2"
