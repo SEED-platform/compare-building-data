@@ -27,8 +27,8 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: SEED-platform/comstock-processor
-          # pinned: later versions drop the comstock_processor module this notebook imports
-          ref: 78949ea7bdeaf5e5eb217b9ff4c5f66fbb6d412d
+          # pinned: first commit requiring pyarrow>=25; ComStockProcessor API unchanged from 78949ea. Later commits (from 9d548b1) rework the class and then rename the package.
+          ref: c331ebe4564e637f7b94f332e51e31ea409274ae
           path: comstock_processor
       - name: Move comstock-processor to expected location
         run: |
