@@ -10,8 +10,6 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            python-version: "3.9"
-          - os: ubuntu-latest
             python-version: "3.12"
           - os: windows-latest
             python-version: "3.12"
@@ -29,6 +27,8 @@ jobs:
         uses: actions/checkout@v7
         with:
           repository: SEED-platform/comstock-processor
+          # pinned: later versions drop the comstock_processor module this notebook imports
+          ref: 78949ea7bdeaf5e5eb217b9ff4c5f66fbb6d412d
           path: comstock_processor
       - name: Move comstock-processor to expected location
         run: |
